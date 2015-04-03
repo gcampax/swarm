@@ -16,7 +16,9 @@
   "dependencies": {
     "devkit-core": "https://github.com/gameclosure/devkit-core#v2.1.3",
     "devkit-entities": "https://github.com/gameclosure/devkit-entities#v0.2.4",
-    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.1.3"
+    "devkit-omlet": "file:///home/gcampagn/school/cs294s/devkit-omlet#master",
+    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.1.3",
+    "omlet": "file:///home/gcampagn/school/cs294s/devkit-omlet#master"
   },
   "icon": "resources/icons/512.png",
   "ios": {

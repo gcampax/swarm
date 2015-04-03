@@ -12,6 +12,7 @@ import ui.widget.ButtonView as ButtonView;
 import entities.Entity as Entity;
 import entities.EntityPool as EntityPool;
 import parallax.Parallax as Parallax;
+import omlet as Omlet;
 
 // game imports
 import src.config as config;
@@ -174,6 +175,11 @@ exports = Class(GC.Application, function(supr) {
 			order: 1,
 			flex: 1,
 		}));
+
+		this.omlet = Omlet.get();
+		this.omlet.initializeOmletPlugin(function() {
+			this._omletInitialized = true;
+		});
 	};
 
 	/**
@@ -271,6 +277,14 @@ exports = Class(GC.Application, function(supr) {
 
 		this.gameOverScore.setText("Your score: " + this.model.score);
 		this.gameOverView.show();
+	};
+
+	this.onShareScore = function() {
+		if (!this._omletInitialized) true;
+
+		this.omlet.sendScore({
+			score: this.model.score,
+		});
 	};
 
 	this.onPlayAgain = function() {

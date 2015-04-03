@@ -1,3 +1,4 @@
+/* -*- mode: js; js-indent-level: 8; indent-tabs-mode: t -*- */
 // devkit and module imports
 import animate;
 import device;
@@ -5,7 +6,9 @@ import ui.View as View;
 import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 import ui.ScoreView as ScoreView;
+import ui.TextView as TextView;
 import ui.ParticleEngine as ParticleEngine;
+import ui.widget.ButtonView as ButtonView;
 import entities.Entity as Entity;
 import entities.EntityPool as EntityPool;
 import parallax.Parallax as Parallax;
@@ -81,6 +84,96 @@ exports = Class(GC.Application, function(supr) {
 			parent: this.elementLayer,
 			zIndex: 60
 		});
+
+		this.gameOverView = new View({
+			parent: this.view,
+			layout: 'linear',
+			direction: 'vertical',
+			justifyContent: 'center',
+			centerX: true,
+			centerY: true,
+			left: 24,
+			right: 24,
+			//layoutHeight: 'wrapContent',
+			height: 300,
+			zIndex: 100,
+			backgroundColor: 'white',
+		});
+
+		(new TextView({
+			parent: this.gameOverView,
+			layout: 'box',
+			direction: 'vertical',
+			autoSize: true,
+			autoFontSize: true,
+			size: 72,
+			left: 24,
+			right: 24,
+			padding: '24 0',
+			//top: 24,
+			//bottom: 48,
+			text: "Game over!",
+			layoutHeight: 'wrapContent',
+			order: 0,
+			flex: 1
+		}));
+		this.gameOverScore = new TextView({
+			parent: this.gameOverView,
+			layout: 'box',
+			direction: 'vertical',
+			size: 64,
+			left: 24,
+			right: 24,
+			padding: '24 0',
+			//top: 48,
+			//bottom: 48,
+			autoSize: true,
+			autoFontSize: true,
+			layoutHeight: 'wrapContent',
+			text: '',
+			order: 1,
+			flex: 1
+		});
+		var gameOverButtonBox = new View({
+			parent: this.gameOverView,
+			layout: 'linear',
+			direction: 'horizontal',
+			height: 144,
+			left: 24,
+			right: 24,
+			padding: '24 0',
+			//bottom: 24,
+			order: 2,
+			flex: 1
+		});
+		(new ButtonView({
+			parent: gameOverButtonBox,
+			on: {
+				up: this.onShareScore.bind(this),
+			},
+			title: "Share score!",
+			layout: 'box',
+			direction: 'horizontal',
+			text: { size: 36, autoSize: true },
+			height: 120,
+			padding: '24 12',
+			order: 0,
+			flex: 1,
+		}));
+		(new ButtonView({
+			parent: gameOverButtonBox,
+			on: {
+				up: this.onPlayAgain.bind(this),
+			},
+			title: "Play again",
+			layout: 'box',
+			direction: 'horizontal',
+			text: { size: 36, autoSize: true },
+			height: 120,
+			padding: '24 12',
+			order: 1,
+			flex: 1,
+		}));
 	};
 
 	/**
@@ -115,6 +208,7 @@ exports = Class(GC.Application, function(supr) {
 		};
 
 		this.scoreView.setText(this.model.score);
+		this.gameOverView.hide();
 
 		this.elementLayer.style.y = 0;
 		this.player.reset();
@@ -155,6 +249,7 @@ exports = Class(GC.Application, function(supr) {
 	};
 
 	this.onBulletHit = function(bullet, enemy) {
+		if (this.model.gameOver) return;
 		effects.emitExplosion(this.particles, enemy);
 		enemy.release();
 		bullet.release();
@@ -163,19 +258,23 @@ exports = Class(GC.Application, function(supr) {
 	};
 
 	this.onGameOver = function() {
-		if (!this.model.gameOver) {
-			// slow motion on game over
-			this.model.timeMult = 0.02;
-			animate(this.model).now({ timeMult: 0.2 }, GAME_OVER_DELAY, animate.easeOut);
-			// special effects on player death
-			effects.emitExplosion(this.particles, this.player);
-			effects.emitEpicExplosion(this.particles, this.player);
-			effects.shakeScreen(this.view);
-			this.player.onDeath();
-			this.model.gameOver = true;
-			// reset the game after 2.5 seconds
-			setTimeout(bind(this, 'reset'), GAME_OVER_DELAY);
-		}
+		if (this.model.gameOver) return;
+
+		// slow motion on game over
+		this.model.timeMult = 0.02;
+		animate(this.model).now({ timeMult: 0.2 }, GAME_OVER_DELAY, animate.easeOut);
+		// special effects on player death
+		effects.emitExplosion(this.particles, this.player);
+		effects.emitEpicExplosion(this.particles, this.player);
+		this.player.onDeath();
+		this.model.gameOver = true;
+
+		this.gameOverScore.setText("Your score: " + this.model.score);
+		this.gameOverView.show();
+	};
+
+	this.onPlayAgain = function() {
+		this.reset();
 	};
 });
 

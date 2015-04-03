@@ -33,14 +33,14 @@
     },
     "versionCode": 1
   },
-  "shortName": "swarm",
+  "shortName": "omletSwarm",
   "splash": {
     "autoHide": true,
     "universal": "resources/splash/splash.png"
   },
   "studio": {
-    "domain": "weeby.co",
-    "name": "Weeby.co"
+    "domain": "cs294s.stanford.edu",
+    "name": "CS294S @ Stanford University"
   },
   "supportedOrientations": [
     "portrait"
